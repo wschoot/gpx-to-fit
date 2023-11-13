@@ -32,10 +32,9 @@ def main():
 
     # Every FIT course file MUST contain a Course message
     message = CourseMessage()
-    message.course_name = 'old stage'
+    message.course_name = gpx.tracks[0].name
     message.sport = Sport.CYCLING
     builder.add(message)
-
 
     start_timestamp = round(datetime.datetime.now().timestamp() * 1000)
 
