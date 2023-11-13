@@ -1,5 +1,4 @@
 import datetime
-from pprint import pprint
 
 import gpxpy
 from geopy.distance import geodesic
@@ -118,9 +117,8 @@ def main():
         # message.
         message.type = CoursePoint.GENERIC
         message.course_point_name = wp.name
-        builder.add(message)  
+        builder.add(message)
         prev_coordinate = current_coordinate
- 
 
     message = CoursePointMessage()
     message.timestamp = course_records[-1].timestamp
