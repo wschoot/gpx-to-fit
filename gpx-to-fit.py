@@ -1,5 +1,7 @@
 import datetime
 
+import sys # for cli args
+
 import gpxpy
 from geopy.distance import geodesic
 
@@ -17,8 +19,12 @@ def main():
     # Set auto_define to true, so that the builder creates the required Definition Messages for us.
     builder = FitFileBuilder(auto_define=True, min_string_size=50)
 
+    if len(sys.argv) == 1:
+        print("Geef arg mee")
+        exit(1)
+
     # Read position data from a GPX file
-    gpx_file = open('huis2huis.GPX', 'r')
+    gpx_file = open(sys.argv[1], 'r')
     gpx = gpxpy.parse(gpx_file)
 
     message = FileIdMessage()
@@ -33,7 +39,7 @@ def main():
     # Every FIT course file MUST contain a Course message
     message = CourseMessage()
     message.course_name = gpx.tracks[0].name
-    message.sport = Sport.CYCLING
+    message.sport = Sport.WALKING
     builder.add(message)
 
     start_timestamp = round(datetime.datetime.now().timestamp() * 1000)
@@ -42,9 +48,9 @@ def main():
     timestamp = start_timestamp
 
     course_records = []  # track points
-
+    course_waypoints = []  # waypoints
     prev_coordinate = None
-    #pprint(gpx.waypoints)
+
     for track_point in gpx.tracks[0].segments[0].points:
         current_coordinate = (track_point.latitude, track_point.longitude)
 
@@ -54,6 +60,20 @@ def main():
         else:
             delta = 0.0
         distance += delta
+
+        for wp in gpx.waypoints:
+            if wp.latitude == track_point.latitude and wp.longitude == track_point.longitude:
+                print ("MATCH")
+                wp_message = CoursePointMessage()
+                wp_message.timestamp = timestamp
+                #wp_message.timestamp = int(wp.time.timestamp() * 1000)
+                wp_message.position_lat = wp.latitude
+                wp_message.position_long = wp.longitude
+                wp_message.distance = distance
+                wp_message.type = CoursePoint.GENERIC
+                wp_message.course_point_name = wp.name
+                if distance != 0.0:
+                    course_waypoints.append(wp_message)
 
         message = RecordMessage()
         message.position_lat = track_point.latitude
@@ -66,6 +86,7 @@ def main():
         timestamp += 10000
         prev_coordinate = current_coordinate
 
+    #print(course_waypoints)
     # Every FIT course file MUST contain a Lap message
     elapsed_time = timestamp - start_timestamp
     message = LapMessage()
@@ -88,36 +109,15 @@ def main():
     #
     message = CoursePointMessage()
     message.timestamp = course_records[0].timestamp
-    print(message.timestamp)
+    #print(message.timestamp)
     message.position_lat = course_records[0].position_lat
     message.position_long = course_records[0].position_long
     message.type = CoursePoint.SEGMENT_START
     message.course_point_name = 'start'
     builder.add(message)
 
-    prev_coordinate = None
-
-    for wp in gpx.waypoints[1:]:
-        current_coordinate = (wp.latitude, wp.longitude)
-
-        # calculate distance from previous coordinate and accumulate distance
-        if prev_coordinate:
-            delta = geodesic(prev_coordinate, current_coordinate).meters
-        else:
-            delta = 0.0
-        distance += delta
-        print(wp.latitude, wp.longitude, wp.time)
-        message = CoursePointMessage()
-        print(int(wp.time.timestamp()) * 1000)
-        message.timestamp = int(wp.time.timestamp() * 1000)
-        message.position_lat = wp.latitude
-        message.position_long = wp.longitude
-        message.distance = distance
-        # message.
-        message.type = CoursePoint.GENERIC
-        message.course_point_name = wp.name
-        builder.add(message)
-        prev_coordinate = current_coordinate
+    print(course_waypoints)
+    builder.add_all(course_waypoints)
 
     message = CoursePointMessage()
     message.timestamp = course_records[-1].timestamp
@@ -130,7 +130,6 @@ def main():
     # stop event
     message = EventMessage()
     message.event = Event.TIMER
-    #message.eventType = EventType.STOP_ALL
     message.event_type = EventType.STOP_DISABLE_ALL
     message.timestamp = timestamp
     message.event_group = 0
@@ -139,9 +138,9 @@ def main():
     # Finally build the FIT file object and write it to a file
     fit_file = builder.build()
 
-    out_path = 'huis2huis.fit'
+    out_path = sys.argv[1] + '.fit'
     fit_file.to_file(out_path)
-    csv_path = 'huis2huis.csv'
+    csv_path = sys.argv[1] + '.csv'
     fit_file.to_csv(csv_path)
 
 
