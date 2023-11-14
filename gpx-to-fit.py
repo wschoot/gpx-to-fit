@@ -27,6 +27,14 @@ def main():
     gpx_file = open(sys.argv[1], 'r')
     gpx = gpxpy.parse(gpx_file)
 
+    if len(gpx.tracks) == 0:
+        print("No track found in GPX")
+        exit(1)
+
+    if len(gpx.waypoints) == 0:
+        print("No track found in GPX")
+        exit(1)
+
     message = FileIdMessage()
     message.type = FileType.COURSE
     message.manufacturer = Manufacturer.DEVELOPMENT.value
@@ -63,7 +71,6 @@ def main():
 
         for wp in gpx.waypoints:
             if wp.latitude == track_point.latitude and wp.longitude == track_point.longitude:
-                print ("MATCH")
                 wp_message = CoursePointMessage()
                 wp_message.timestamp = timestamp
                 #wp_message.timestamp = int(wp.time.timestamp() * 1000)
@@ -86,7 +93,6 @@ def main():
         timestamp += 10000
         prev_coordinate = current_coordinate
 
-    #print(course_waypoints)
     # Every FIT course file MUST contain a Lap message
     elapsed_time = timestamp - start_timestamp
     message = LapMessage()
@@ -109,14 +115,12 @@ def main():
     #
     message = CoursePointMessage()
     message.timestamp = course_records[0].timestamp
-    #print(message.timestamp)
     message.position_lat = course_records[0].position_lat
     message.position_long = course_records[0].position_long
     message.type = CoursePoint.SEGMENT_START
     message.course_point_name = 'start'
     builder.add(message)
 
-    print(course_waypoints)
     builder.add_all(course_waypoints)
 
     message = CoursePointMessage()
