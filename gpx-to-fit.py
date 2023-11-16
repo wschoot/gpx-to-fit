@@ -1,5 +1,7 @@
 import datetime
 
+import math, numpy as np
+
 import sys # for cli args
 
 import gpxpy
@@ -14,6 +16,13 @@ from fit_tool.profile.messages.lap_message import LapMessage
 from fit_tool.profile.messages.record_message import RecordMessage
 from fit_tool.profile.profile_type import FileType, Manufacturer, Sport, Event, EventType, CoursePoint
 
+def get_bearing(lat1,lon1,lat2,lon2):
+    dLon = lon2 - lon1;
+    y = math.sin(dLon) * math.cos(lat2);
+    x = math.cos(lat1)*math.sin(lat2) - math.sin(lat1)*math.cos(lat2)*math.cos(dLon);
+    brng = np.rad2deg(math.atan2(y, x));
+    if brng < 0: brng+= 360
+    return brng
 
 def main():
     # Set auto_define to true, so that the builder creates the required Definition Messages for us.
@@ -58,6 +67,8 @@ def main():
     course_records = []  # track points
     course_waypoints = []  # waypoints
     prev_coordinate = None
+    prev_bearing = None
+    bearing_min = 20 # only set coursepoints when the distance is over bearing_min
 
     for track_point in gpx.tracks[0].segments[0].points:
         current_coordinate = (track_point.latitude, track_point.longitude)
@@ -69,11 +80,61 @@ def main():
             delta = 0.0
         distance += delta
 
+        if prev_coordinate is not None:
+            #print ( current_coordinate)
+            #print ( current_coordinate[0])
+            lat1 = prev_coordinate[0]
+            lon1 = prev_coordinate[1]
+            lat2 = current_coordinate[0]
+            lon2 = current_coordinate[1]
+            bearing = get_bearing(lat1,lon1,lat2,lon2)
+
+            if prev_bearing is not None:
+                wp_message = CoursePointMessage()
+                wp_message.timestamp = timestamp
+                wp_message.position_lat = track_point.latitude
+                wp_message.position_long = track_point.longitude
+                wp_message.distance = distance
+
+                richting = round(prev_bearing - bearing)
+                if richting < 0:
+                    richting += 360
+
+                add_point = True
+                if 30 <= richting < 60:
+                    richting_text = "Slight right"
+                    wp_message.type = CoursePoint.SLIGHT_RIGHT
+                elif 60 <= richting < 120:
+                    richting_text = "Right"
+                    wp_message.type = CoursePoint.RIGHT
+                elif 120 <= richting < 150:
+                    richting_text = "Sharp right"
+                    wp_message.type = CoursePoint.SHARP_RIGHT
+                elif 150 <= richting < 210:
+                    richting_text = "Turn back"
+                    wp_message.type = CoursePoint.U_TURN
+                elif 210 <= richting < 240:
+                    richting_text = "Sharp left"
+                    wp_message.type = CoursePoint.SHARP_LEFT
+                elif 240 <= richting < 300:
+                    richting_text = "Left"
+                    wp_message.type = CoursePoint.LEFT
+                elif 300 <= richting < 330:
+                    richting_text = "Slight left"
+                    wp_message.type = CoursePoint.SLIGHT_LEFT
+                else:
+                    richting_text = ""
+                    add_point = False
+
+                if delta > bearing_min and add_point == True:
+                    course_waypoints.append(wp_message)
+                    print ("Adding coursepoint: Bearing: ", round(bearing), ", prev bearing: ", round(prev_bearing), ", result: ", richting_text, ", delta: ", round(delta), "distance: ", round(distance), ("YOLO" if delta >bearing_min  else ''), "added!" if add_point == True and delta > bearing_min else '')
+            prev_bearing = get_bearing(lat1,lon1,lat2,lon2)
+
         for wp in gpx.waypoints:
             if wp.latitude == track_point.latitude and wp.longitude == track_point.longitude:
                 wp_message = CoursePointMessage()
                 wp_message.timestamp = timestamp
-                #wp_message.timestamp = int(wp.time.timestamp() * 1000)
                 wp_message.position_lat = wp.latitude
                 wp_message.position_long = wp.longitude
                 wp_message.distance = distance
