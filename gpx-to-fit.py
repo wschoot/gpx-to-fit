@@ -18,9 +18,24 @@ from fit_tool.profile.messages.lap_message import LapMessage
 from fit_tool.profile.messages.record_message import RecordMessage
 from fit_tool.profile.profile_type import FileType, Manufacturer, Sport, Event, EventType, CoursePoint
 
+def decdeg2dms(dd):
+    negative = dd < 0
+    dd = abs(dd)
+    minutes,seconds = divmod(dd*3600,60)
+    degrees,minutes = divmod(minutes,60)
+    if negative:
+        if degrees > 0:
+            degrees = -degrees
+        elif minutes > 0:
+            minutes = -minutes
+        else:
+            seconds = -seconds
+    return (degrees,minutes,seconds)
+
 def get_bearing2(lat1, long1, lat2, long2):
     brng = Geodesic.WGS84.Inverse(lat1, long1, lat2, long2)['azi1']
     if brng < 0: brng+= 360
+    # print (decdeg2dms(lat1), decdeg2dms(long1))
     return round(brng)
 
 def get_bearing_details(richting):
@@ -101,45 +116,55 @@ def main():
     delta = 0.0
     bearing_min = 20 # only set coursepoints when the distance is over bearing_min
     trackpointindex = 0
+    richting_distance = 0
     ## FOR
+    print("Total GPS points: ", len(gpx.tracks[0].segments[0].points))
     for track_point in gpx.tracks[0].segments[0].points:
-        print ("TP: ", trackpointindex)
         current_coordinate = (track_point.latitude, track_point.longitude)
-
+        if trackpointindex > 0:
+            prev_coordinate = (gpx.tracks[0].segments[0].points[trackpointindex-1].latitude, gpx.tracks[0].segments[0].points[trackpointindex-1].longitude)
+        if trackpointindex < len(gpx.tracks[0].segments[0].points)-1:
+            next_coordinate = (gpx.tracks[0].segments[0].points[trackpointindex+1].latitude, gpx.tracks[0].segments[0].points[trackpointindex+1].longitude)
         # If a previous coordinate is set (ie not first point in track)
-        if prev_coordinate:
-            delta = geodesic(prev_coordinate, current_coordinate).meters
-            (lat1, lon1) = prev_coordinate
-            (lat2, lon2) = current_coordinate
-            bearing = get_bearing2(lat1,lon1,lat2,lon2)
-            print ("delta: ", round(delta), "(prev) bearing: ", prev_bearing, bearing, "distance: ", round(distance))
+        # if prev_coordinate:
+        delta = geodesic(current_coordinate, next_coordinate).meters
+        # (lat1, lon1) = prev_coordinate
+        # (lat2, lon2) = current_coordinate
+        (lat1, lon1) = current_coordinate
+        (lat2, lon2) = next_coordinate
+        bearing = get_bearing2(lat1,lon1,lat2,lon2)
+        print ("TP: ", trackpointindex,
+               "deltadistance: ", round(delta),
+               "(prev) bearing: ", prev_bearing, bearing,
+               "total distance: ", round(distance),
+               "prev", prev_coordinate,
+               "curr", current_coordinate,
+               "next", next_coordinate,
+                )
 
-            if prev_bearing:
-                wp_message = CoursePointMessage()
-                wp_message.timestamp = timestamp
-                wp_message.position_lat = track_point.latitude
-                wp_message.position_long = track_point.longitude
-                wp_message.distance = distance
+        if prev_bearing:
 
-                if prev_bearing > bearing:
-                    richting = round(prev_bearing - bearing)
+            richting = round(bearing - prev_bearing)
 
-                    if richting < 0:
-                        richting += 360
+            if richting < 0:
+                richting += 360
 
-                else:
-                    richting = round(bearing - prev_bearing)
+            print("Richting: ", richting)
 
-                    if richting > 360:
-                        richting -= 360
+            if (distance - richting_distance) > bearing_min or richting_distance == 0:
+                (add_point,richting_text,wp_message.type) = get_bearing_details(richting)
+                if add_point == True and delta > bearing_min:
+                    wp_message = CoursePointMessage()
+                    wp_message.timestamp = timestamp
+                    wp_message.position_lat = track_point.latitude
+                    wp_message.position_long = track_point.longitude
+                    wp_message.distance = distance
 
-                if delta > bearing_min:
-                    (add_point,richting_text,wp_message.type) = get_bearing_details(richting)
+                    richting_distance = distance
+                    print("WP added")
+                    course_waypoints.append(wp_message)
 
-                    if add_point == True and delta > bearing_min:
-                        course_waypoints.append(wp_message)
-
-            prev_bearing = bearing
+        prev_bearing = bearing
 
 
         for wp in gpx.waypoints:
