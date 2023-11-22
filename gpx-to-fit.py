@@ -18,6 +18,12 @@ from fit_tool.profile.messages.lap_message import LapMessage
 from fit_tool.profile.messages.record_message import RecordMessage
 from fit_tool.profile.profile_type import FileType, Manufacturer, Sport, Event, EventType, CoursePoint
 
+def print_coordinate(coordinate):
+    if coordinate:
+        (lat,long) = coordinate
+        return (("%.5f" % lat), ("%.5f" % long))
+    else:
+        return None
 def decdeg2dms(dd):
     negative = dd < 0
     dd = abs(dd)
@@ -121,6 +127,7 @@ def main():
     print("Total GPS points: ", len(gpx.tracks[0].segments[0].points))
     for track_point in gpx.tracks[0].segments[0].points:
         current_coordinate = (track_point.latitude, track_point.longitude)
+
         if trackpointindex > 0:
             prev_coordinate = (gpx.tracks[0].segments[0].points[trackpointindex-1].latitude, gpx.tracks[0].segments[0].points[trackpointindex-1].longitude)
         if trackpointindex < len(gpx.tracks[0].segments[0].points)-1:
@@ -137,9 +144,9 @@ def main():
                "deltadistance: ", round(delta),
                "(prev) bearing: ", prev_bearing, bearing,
                "total distance: ", round(distance),
-               "prev", prev_coordinate,
-               "curr", current_coordinate,
-               "next", next_coordinate,
+            #    "prev", print_coordinate(prev_coordinate),
+               "curr", print_coordinate(current_coordinate),
+            #    "next", print_coordinate(next_coordinate),
                 )
 
         if prev_bearing:

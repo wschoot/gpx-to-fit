@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:wptx1="http://www.garmin.com/xmlschemas/WaypointExtension/v1" xmlns:gpxtrx="http://www.garmin.com/xmlschemas/GpxExtensions/v3" xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1" xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3" xmlns:trp="http://www.garmin.com/xmlschemas/TripExtensions/v1" xmlns:adv="http://www.garmin.com/xmlschemas/AdventuresExtensions/v1" xmlns:prs="http://www.garmin.com/xmlschemas/PressureExtension/v1" xmlns:tmd="http://www.garmin.com/xmlschemas/TripMetaDataExtensions/v1" xmlns:vptm="http://www.garmin.com/xmlschemas/ViaPointTransportationModeExtensions/v1" xmlns:ctx="http://www.garmin.com/xmlschemas/CreationTimeExtension/v1" xmlns:gpxacc="http://www.garmin.com/xmlschemas/AccelerationExtension/v1" xmlns:gpxpx="http://www.garmin.com/xmlschemas/PowerExtension/v1" xmlns:vidx1="http://www.garmin.com/xmlschemas/VideoExtension/v1" creator="Garmin Desktop App" version="1.1" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/WaypointExtension/v1 http://www8.garmin.com/xmlschemas/WaypointExtensionv1.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www8.garmin.com/xmlschemas/GpxExtensionsv3.xsd http://www.garmin.com/xmlschemas/ActivityExtension/v1 http://www8.garmin.com/xmlschemas/ActivityExtensionv1.xsd http://www.garmin.com/xmlschemas/AdventuresExtensions/v1 http://www8.garmin.com/xmlschemas/AdventuresExtensionv1.xsd http://www.garmin.com/xmlschemas/PressureExtension/v1 http://www.garmin.com/xmlschemas/PressureExtensionv1.xsd http://www.garmin.com/xmlschemas/TripExtensions/v1 http://www.garmin.com/xmlschemas/TripExtensionsv1.xsd http://www.garmin.com/xmlschemas/TripMetaDataExtensions/v1 http://www.garmin.com/xmlschemas/TripMetaDataExtensionsv1.xsd http://www.garmin.com/xmlschemas/ViaPointTransportationModeExtensions/v1 http://www.garmin.com/xmlschemas/ViaPointTransportationModeExtensionsv1.xsd http://www.garmin.com/xmlschemas/CreationTimeExtension/v1 http://www.garmin.com/xmlschemas/CreationTimeExtensionsv1.xsd http://www.garmin.com/xmlschemas/AccelerationExtension/v1 http://www.garmin.com/xmlschemas/AccelerationExtensionv1.xsd http://www.garmin.com/xmlschemas/PowerExtension/v1 http://www.garmin.com/xmlschemas/PowerExtensionv1.xsd http://www.garmin.com/xmlschemas/VideoExtension/v1 http://www.garmin.com/xmlschemas/VideoExtensionv1.xsd">
+  <metadata>
+    <link href="http://www.garmin.com">
+      <text>Garmin International</text>
+    </link>
+    <time>2023-11-22T11:24:35Z</time>
+    <bounds maxlat="52.229561805725098" maxlon="6.909263134002686" minlat="52.228531837463379" minlon="6.907954216003418"/>
+  </metadata>
+  <wpt lat="52.22942903637886" lon="6.909052999690175">
+    <time>2023-11-21T19:16:02Z</time>
+    <name>Art on Powerhouse Geraniumstraat</name>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2023-11-21T19:16:02Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+  <wpt lat="52.228858983144164" lon="6.909189959987998">
+    <time>2023-11-21T19:16:02Z</time>
+    <name>Art on Powerhouse Happy Flowers</name>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2023-11-21T19:16:02Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+  <wpt lat="52.228820007294416" lon="6.908142976462841">
+    <time>2023-11-21T19:16:02Z</time>
+    <name>Art on Powerhouse Pink Geraniums</name>
+    <sym>Flag, Blue</sym>
+    <type>user</type>
+    <extensions>
+      <gpxx:WaypointExtension>
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+      <wptx1:WaypointExtension>
+        <wptx1:DisplayMode>SymbolAndName</wptx1:DisplayMode>
+      </wptx1:WaypointExtension>
+      <ctx:CreationTimeExtension>
+        <ctx:CreationTime>2023-11-21T19:16:02Z</ctx:CreationTime>
+      </ctx:CreationTimeExtension>
+    </extensions>
+  </wpt>
+  <trk>
+    <name>Art on Powerhouse Pink Geraniums to Art on Powerhouse Pink Geraniums</name>
+    <extensions>
+      <gpxx:TrackExtension>
+        <gpxx:DisplayColor>DarkGray</gpxx:DisplayColor>
+      </gpxx:TrackExtension>
+    </extensions>
+    <trkseg>
+      <trkpt lat="52.228820007294416" lon="6.908142976462841">
+        <ele>47.82421875</ele>
+        <time>2023-11-22T11:02:57Z</time>
+      </trkpt>
+      <trkpt lat="52.228775750845671" lon="6.90809553489089">
+        <ele>47.765625</ele>
+      </trkpt>
+      <trkpt lat="52.228832244873047" lon="6.907954216003418">
+        <ele>47.59765625</ele>
+      </trkpt>
+      <trkpt lat="52.22900390625" lon="6.907997131347656">
+        <ele>47.6484375</ele>
+      </trkpt>
+      <trkpt lat="52.229068279266357" lon="6.907975673675537">
+        <ele>47.71875</ele>
+      </trkpt>
+      <trkpt lat="52.229454517364502" lon="6.908833980560303">
+        <ele>48.18359375</ele>
+      </trkpt>
+      <trkpt lat="52.229561805725098" lon="6.909070014953613">
+        <ele>48.04296875</ele>
+      </trkpt>
+      <trkpt lat="52.229433646425605" lon="6.909102955833077">
+        <ele>48.01171875</ele>
+      </trkpt>
+      <trkpt lat="52.22942903637886" lon="6.909052999690175">
+        <ele>48.04296875</ele>
+      </trkpt>
+      <trkpt lat="52.229433646425605" lon="6.909102955833077">
+        <ele>48.01171875</ele>
+      </trkpt>
+      <trkpt lat="52.228810787200928" lon="6.909263134002686">
+        <ele>48.48046875</ele>
+      </trkpt>
+      <trkpt lat="52.228864682838321" lon="6.909249387681484">
+        <ele>48.3515625</ele>
+      </trkpt>
+      <trkpt lat="52.228858983144164" lon="6.909189959987998">
+        <ele>48.36328125</ele>
+      </trkpt>
+      <trkpt lat="52.228864682838321" lon="6.909249387681484">
+        <ele>48.3515625</ele>
+      </trkpt>
+      <trkpt lat="52.228810787200928" lon="6.909263134002686">
+        <ele>48.48046875</ele>
+      </trkpt>
+      <trkpt lat="52.228767871856689" lon="6.909263134002686">
+        <ele>48.58203125</ele>
+      </trkpt>
+      <trkpt lat="52.228553295135498" lon="6.908855438232422">
+        <ele>48.74609375</ele>
+      </trkpt>
+      <trkpt lat="52.228531837463379" lon="6.908769607543945">
+        <ele>48.66015625</ele>
+      </trkpt>
+      <trkpt lat="52.228531837463379" lon="6.908705234527588">
+        <ele>48.5703125</ele>
+      </trkpt>
+      <trkpt lat="52.228832244873047" lon="6.907954216003418">
+        <ele>47.59765625</ele>
+      </trkpt>
+      <trkpt lat="52.228775750845671" lon="6.90809553489089">
+        <ele>47.765625</ele>
+      </trkpt>
+      <trkpt lat="52.228820007294416" lon="6.908142976462841">
+        <ele>47.82421875</ele>
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>
