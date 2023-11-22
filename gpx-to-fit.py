@@ -1,13 +1,10 @@
 import datetime
 
-import math, numpy as np
-
 import sys # for cli args
 
 import gpxpy
 from geopy.distance import geodesic
 from geographiclib.geodesic import Geodesic
-
 
 from fit_tool.fit_file_builder import FitFileBuilder
 from fit_tool.profile.messages.course_message import CourseMessage
