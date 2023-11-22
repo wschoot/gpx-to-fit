@@ -24,24 +24,10 @@ def print_coordinate(coordinate):
         return (("%.5f" % lat), ("%.5f" % long))
     else:
         return None
-def decdeg2dms(dd):
-    negative = dd < 0
-    dd = abs(dd)
-    minutes,seconds = divmod(dd*3600,60)
-    degrees,minutes = divmod(minutes,60)
-    if negative:
-        if degrees > 0:
-            degrees = -degrees
-        elif minutes > 0:
-            minutes = -minutes
-        else:
-            seconds = -seconds
-    return (degrees,minutes,seconds)
-
+    
 def get_bearing2(lat1, long1, lat2, long2):
     brng = Geodesic.WGS84.Inverse(lat1, long1, lat2, long2)['azi1']
     if brng < 0: brng+= 360
-    # print (decdeg2dms(lat1), decdeg2dms(long1))
     return round(brng)
 
 def get_bearing_details(richting):
@@ -173,7 +159,6 @@ def main():
 
         prev_bearing = bearing
 
-
         for wp in gpx.waypoints:
             if (wp.latitude == track_point.latitude and wp.longitude == track_point.longitude) or (prev_coordinate and (prev_coordinate[0] <= wp.latitude <= current_coordinate[0] and prev_coordinate[1] <= wp.longitude <= current_coordinate[1])):
                 print(wp.name)
@@ -195,7 +180,7 @@ def main():
         message.position_long = track_point.longitude
         message.distance = distance
         message.timestamp = timestamp
-        message.enhanced_altitude = 0
+        message.enhanced_altitude = 0 # FIXME Als er een elevation is, toevoegen, anders op nul laten
         course_records.append(message)
 
         timestamp += 10000
