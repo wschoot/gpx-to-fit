@@ -36,13 +36,13 @@ def get_bearing_details(richting):
     elif 60 <= richting < 120:
         richting_text = "Right"
         type = CoursePoint.RIGHT
-    elif 120 <= richting < 150:
+    elif 120 <= richting < 170:
         richting_text = "Sharp right"
         type = CoursePoint.SHARP_RIGHT
-    elif 150 <= richting < 210:
+    elif 170 <= richting < 190:
         richting_text = "Turn back"
         type = CoursePoint.U_TURN
-    elif 210 <= richting < 240:
+    elif 190 <= richting < 240:
         richting_text = "Sharp left"
         type = CoursePoint.SHARP_LEFT
     elif 240 <= richting < 300:
@@ -105,7 +105,8 @@ def main():
     delta = 0.0
     bearing_min = 20 # only set coursepoints when the distance is over bearing_min
     trackpointindex = 0
-    richting_distance = 0
+    # richting_distance = 0
+    distance_since_last_direction = 0
     ## FOR
     print("Total GPS points: ", len(gpx.tracks[0].segments[0].points))
     for track_point in gpx.tracks[0].segments[0].points:
@@ -114,6 +115,7 @@ def main():
         if trackpointindex > 0:
             prev_coordinate = (gpx.tracks[0].segments[0].points[trackpointindex-1].latitude, gpx.tracks[0].segments[0].points[trackpointindex-1].longitude)
         if trackpointindex < len(gpx.tracks[0].segments[0].points)-1:
+            # If last point then next_coordinate is not updated (still last point, not set to NULL), so delta will become 0
             next_coordinate = (gpx.tracks[0].segments[0].points[trackpointindex+1].latitude, gpx.tracks[0].segments[0].points[trackpointindex+1].longitude)
         # If a previous coordinate is set (ie not first point in track)
         # if prev_coordinate:
@@ -132,7 +134,7 @@ def main():
             #    "next", print_coordinate(next_coordinate),
                 )
 
-        if prev_bearing:
+        if prev_bearing is not None:
 
             richting = round(bearing - prev_bearing)
 
@@ -141,19 +143,25 @@ def main():
 
             print("Richting: ", richting)
 
-            if (distance - richting_distance) > bearing_min or richting_distance == 0:
-                (add_point,richting_text,wp_message.type) = get_bearing_details(richting)
-                if add_point == True and delta > bearing_min:
-                    wp_message = CoursePointMessage()
-                    wp_message.timestamp = timestamp
-                    wp_message.position_lat = track_point.latitude
-                    wp_message.position_long = track_point.longitude
-                    wp_message.distance = distance
+            # FIXME waarom gebruik je richting_distance? En waarom distance-richting_distance? Je doet vlak daarna nog een check? Alleen om te checken of delta bestaat?
+            # if (distance - richting_distance) > bearing_min or richting_distance == 0:
+            wp_message = CoursePointMessage() # Create here, so we can set wp_message.type
+            (add_point,richting_text,wp_message.type) = get_bearing_details(richting)
+            # FIXME je wilt niet message onderdrukken bij korte afstanden.. je wilt vooral geen berichten als je er net 1 hebt gehad
+            if add_point == True and distance_since_last_direction > bearing_min and delta > 0:
+                wp_message.timestamp = timestamp
+                wp_message.position_lat = track_point.latitude
+                wp_message.position_long = track_point.longitude
+                wp_message.distance = distance
 
-                    richting_distance = distance
-                    print("WP added")
-                    course_waypoints.append(wp_message)
+                distance_since_last_direction = 0
 
+                # Moet dit niet buiten deze if-statements?
+                # richting_distance = distance
+                print("WP added")
+                course_waypoints.append(wp_message)
+
+        distance_since_last_direction += delta
         prev_bearing = bearing
 
         for wp in gpx.waypoints:
@@ -181,7 +189,7 @@ def main():
         course_records.append(message)
 
         timestamp += 10000
-        prev_coordinate = current_coordinate
+        prev_coordinate = current_coordinate  # FIXME : je set deze ook al bovenin de functie, dus of deze of die ander kan weg
         trackpointindex += 1
     ## ENDFOR
 
