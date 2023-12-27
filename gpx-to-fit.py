@@ -83,7 +83,7 @@ def main():
     # add a trackpoint for every waypoint where there is no trackpoint yet
     if OPTIMISE_ME_ADD_WAYPOINTS_AS_TRACKPOINTS:
         for wp in gpx.waypoints:
-            print(f"check waypoint {wp.name}")
+            # print(f"check waypoint {wp.name}")
             gpx_length = len(gpx.tracks[0].segments[0].points)
             has_trackpoint = False
             insert_i = None
@@ -95,7 +95,7 @@ def main():
                 coordinate_i = (lat_i, lon_i)
 
                 delta_i = geodesic((wp.latitude, wp.longitude), coordinate_i).meters
-                print(f"{wp.name}, i={i}, insert_i = {insert_i}, delta = {delta_i}, i_delta = {insert_i_delta}")
+                # print(f"{wp.name}, i={i}, insert_i = {insert_i}, delta = {delta_i}, i_delta = {insert_i_delta}")
 
                 if wp.latitude == lat_i and wp.longitude == lon_i:
                     has_trackpoint = True
@@ -109,19 +109,18 @@ def main():
 
             # insert a trackpoint if there is none yet
             if has_trackpoint == False:
-                print(f"Change {gpx.tracks[0].segments[0].points[insert_i].longitude} -> {wp.longitude} and {gpx.tracks[0].segments[0].points[insert_i].latitude} -> {wp.latitude}")
-                print(f"insert at {insert_i+1}")
+                print(f"Insert at {insert_i+1}. Add {gpx.tracks[0].segments[0].points[insert_i].longitude} <-> {wp.longitude} and {gpx.tracks[0].segments[0].points[insert_i].latitude} <-> {wp.latitude}")
                 gpx.tracks[0].segments[0].points.insert(insert_i+1, gpx.tracks[0].segments[0].points[insert_i])
                 gpx.tracks[0].segments[0].points.insert(insert_i+1, gpxpy.gpx.GPXTrackPoint(wp.latitude, wp.longitude, elevation=0))
-
-                print(insert_i, gpx.tracks[0].segments[0].points[insert_i])
-                print(insert_i+1, gpx.tracks[0].segments[0].points[insert_i+1])
-                print(insert_i+2, gpx.tracks[0].segments[0].points[insert_i+2])
-            else:
-                print("Allready has a trackpoint")
+                # print(insert_i, gpx.tracks[0].segments[0].points[insert_i])
+                # print(insert_i+1, gpx.tracks[0].segments[0].points[insert_i+1])
+                # print(insert_i+2, gpx.tracks[0].segments[0].points[insert_i+2])
+            # else:
+            #     print("Allready has a trackpoint")
 
 
     if OPTIMISE_ME:
+        print("Check uturns.... (optimise-me)")
         changed_gpx = True # Set true for entering first time
         while changed_gpx:
             # print("while changed_gpx")
@@ -130,7 +129,7 @@ def main():
             for i in range(gpx_length-2):
                 if changed_gpx:
                         break
-                # if i < gpx_length: # TODO: check only 2 elements
+                # if i < gpx_length: # TODO: check only 2 elements; There is no uturn on 1 segment, so no need?
                 coordinate_0 = (gpx.tracks[0].segments[0].points[i+0].latitude, gpx.tracks[0].segments[0].points[i+0].longitude)
                 coordinate_1 = (gpx.tracks[0].segments[0].points[i+1].latitude, gpx.tracks[0].segments[0].points[i+1].longitude)
                 coordinate_2 = (gpx.tracks[0].segments[0].points[i+2].latitude, gpx.tracks[0].segments[0].points[i+2].longitude)
@@ -144,29 +143,43 @@ def main():
                 bearing1 = get_bearing2(lat1,lon1,lat2,lon2)
 
                 if delta_1 == 0:
-                    # print(f"Delete {i+1}")
+                    print(f"(optimise-me) Delete {i+1}, delta is 0., {lat0 == lat1 and lon0 == lon1}")
                     del gpx.tracks[0].segments[0].points[i+1]
                     changed_gpx = True
                     break
 
-                if ((bearing0 - bearing1) % 360) == 180 and delta_1 >= delta_2:
+                if ((bearing0 - bearing1) % 360) == 180:
                     # It's a U-turn. Remove unless there is a waypoint
+                    # FIXME: mag portal 20 meter opschuiven, wel de waypoint zelf dan aanpassen!
+                    if delta_1 <= delta_2:
                         found_wp = False
                         for wp in gpx.waypoints:
-                            if (wp.latitude == lat1 and wp.longitude == lon1) or \
-                                (lat0 <= wp.latitude <= lat1 \
-                                    and lon0 <= wp.longitude <= lon1):
-                                # print("Waypoint in U-turn, so do not delete", wp.name, " for i=", i)
+                            # heb voor alle waypoints een trackpoint toegevoegd, dus waarom moet ik dan <=/>= checken ipv alleen ==?
+                            if (lat0 < wp.latitude <= lat1 or lat0 > wp.latitude >= lat1) \
+                                and (lon0 < wp.longitude <= lon1 or  lon0 > wp.longitude >= lon1):
+                                print("(optimise-me) Waypoint in U-turn, so do not delete", wp.name, " for i=", i)
+                                found_wp = True
+                            # print("optimise-me: delta for waypoint = ", geodesic((lat1, lon1), (wp.latitude, wp.longitude)).meters)
+                        if found_wp == False:
+                            # print(f"Found NO waypoint for i={i}, change poits for {i+1}. Lon: {gpx.tracks[0].segments[0].points[i+1].longitude} -> {lon0 + (delta_2 / delta_1) * (lon1 - lon0)}, lat = {gpx.tracks[0].segments[0].points[i+1].latitude} -> {lat0 + (delta_2 / delta_1) * (lat1 - lat0)}, deltas = {delta_1}, {delta_2}; Longs: {lon0}, {lon1}, {lon2}. Lats: {lat0}, {lat1}, {lat2}.")
+                            # gpx.tracks[0].segments[0].points[i+1].longitude = lon0# + (delta_2 / delta_1) * (lon1 - lon0)
+                            # gpx.tracks[0].segments[0].points[i+1].latitude = lat0# + (delta_2 / delta_1) * (lat1 - lat0)
+                            print(f"(optimise-me) Found NO waypoint for i={i+1}, delete {gpx.tracks[0].segments[0].points[i+1]}. Deltas = {delta_1}, {delta_2}")
+                            del gpx.tracks[0].segments[0].points[i+1]
+                            changed_gpx = True
+                    elif delta_1 >= delta_2:
+                        found_wp = False
+                        for wp in gpx.waypoints:
+                            if (lat1 <= wp.latitude < lat2 or lat1 >= wp.latitude > lat2) and (lon1 <= wp.longitude < lon2 or lon1 >= wp.longitude > lon2):
+                                print("(optimise-me) Waypoint2 in U-turn, so do not delete", wp.name, " for i=", i)
                                 found_wp = True
                         if found_wp == False:
-                            # print(f"Found NO waitpoint for i={i}, change poits for {i+1}. Lon: {gpx.tracks[0].segments[0].points[i+1].longitude} -> {lon0 + (delta_2 / delta_1) * (lon1 - lon0)}, lat = {gpx.tracks[0].segments[0].points[i+1].latitude} -> {lat0 + (delta_2 / delta_1) * (lat1 - lat0)}, deltas = {delta_1}, {delta_2}; Longs: {lon0}, {lon1}, {lon2}. Lats: {lat0}, {lat1}, {lat2}.")
+                            print(f"(optimise-me) Want to delete part of the track.. {gpx.tracks[0].segments[0].points[i]}, {gpx.tracks[0].segments[0].points[i+1], {gpx.tracks[0].segments[0].points[i+2]}}")
+                            # print(f"Found NO waitpoint for i={i}, change poits for {  i+1}. Lon: {gpx.tracks[0].segments[0].points[i+1].longitude} -> {lon0 + (delta_2 / delta_1) * (lon1 - lon0)}, lat = {gpx.tracks[0].segments[0].points[i+1].latitude} -> {lat0 + (delta_2 / delta_1) * (lat1 - lat0)}, deltas = {delta_1}, {delta_2}; Longs: {lon0}, {lon1}, {lon2}. Lats: {lat0}, {lat1}, {lat2}.")
                             # gpx.tracks[0].segments[0].points[i+1].longitude = lon0# + (delta_2 / delta_1) * (lon1 - lon0)
                             # gpx.tracks[0].segments[0].points[i+1].latitude = lat0# + (delta_2 / delta_1) * (lat1 - lat0)
                             del gpx.tracks[0].segments[0].points[i+1]
                             changed_gpx = True
-                # TODO: delta2 > delta1 (so going back from where we came from)
-                # TODO: checken of 2 punten identiek zijn
-
         
 
     message = FileIdMessage()
@@ -254,8 +267,17 @@ def main():
 
         for wp in gpx.waypoints:
             if (wp.latitude == track_point.latitude and wp.longitude == track_point.longitude) or \
-                  (prev_coordinate and (prev_coordinate[0] <= wp.latitude <= current_coordinate[0] \
-                    and prev_coordinate[1] <= wp.longitude <= current_coordinate[1])):
+                  (prev_coordinate and ( \
+                        (
+                          prev_coordinate[0] <= wp.latitude <= current_coordinate[0] or \
+                          prev_coordinate[0] >= wp.latitude >= current_coordinate[0]
+                        )
+                    and 
+                    (
+                        prev_coordinate[1] <= wp.longitude <= current_coordinate[1] or \
+                        prev_coordinate[1] >= wp.longitude >= current_coordinate[1]
+                    )
+                )):
                 print(wp.name)
                 wp_message = CoursePointMessage()
                 wp_message.timestamp = timestamp
