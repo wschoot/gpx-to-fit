@@ -1,3 +1,7 @@
+# Background
+
+I've made https://github.com/wschoot/gpx-to-fit public but mainly see this as inspiration as it may be a bit rough around the edges. The usecase for myself mainly is to have a GPX with some waypoints I want to visit in optimal order using Up Ahead on my Garmin watch. I then load the GPX with the waypoints into Garmin Basecamp which allows me to create a track (not a route) using "Optimize" to calculate the best route. the gpx-to-fit.py script combines this into something my Fenix 7 understands.
+
 # Requirements
 
 Install some required Python modules
@@ -5,7 +9,7 @@ Install some required Python modules
 ```bash
 pip install -r requirements.txt
 ```
-The supplied `wijkrondje.gpx` consists of three (gpx) waypoints in a GPX track (not a course) which this tool converts to (fit) course points. It keeps the (gpx) trackpoints and adds them to the (fit) courserecords. It also adds some turn by turn directions but they don't appear on my Garmin up ahead yet.
+The supplied `wijkrondje.gpx` consists of three (gpx) waypoints in a GPX track (not a route!) which this tool converts to (fit) course points. It keeps the (gpx) trackpoints and adds them to the (fit) courserecords. It also adds some turn by turn directions but they don't appear on my Garmin up ahead yet.
 
 ```xml
 $ cat wijkrondje.gpx | grep -v '<ele>' | grep -v '</trkpt>' | egrep '(trk|w)pt '
