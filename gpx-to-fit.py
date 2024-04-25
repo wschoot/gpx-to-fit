@@ -17,6 +17,7 @@ from fit_tool.profile.profile_type import FileType, Manufacturer, Sport, Event, 
 
 OPTIMISE_ME = True # Set to true if you want to remove unnecessary u-turns
 OPTIMISE_ME_ADD_WAYPOINTS_AS_TRACKPOINTS = True
+ADD_ROUTE_FLAGS = False
 
 def print_coordinate(coordinate):
     if coordinate:
@@ -24,7 +25,7 @@ def print_coordinate(coordinate):
         return (("%.5f" % lat), ("%.5f" % long))
     else:
         return None
-    
+
 def get_bearing2(lat1, long1, lat2, long2):
     brng = Geodesic.WGS84.Inverse(lat1, long1, lat2, long2)['azi1']
     if brng < 0: brng+= 360
@@ -57,7 +58,10 @@ def get_bearing_details(richting):
     else:
         richting_text = ""
         add_point = False
-    print ("getbearingdetails", richting, add_point,richting_text, type)
+    if ADD_ROUTE_FLAGS == False:
+        add_point = False
+
+    print ("getbearingdetails", richting, add_point, richting_text, type)
     return (add_point,richting_text, type)
 
 def main():
@@ -167,8 +171,6 @@ def main():
                 # TODO: delta2 > delta1 (so going back from where we came from)
                 # TODO: checken of 2 punten identiek zijn
 
-        
-
     message = FileIdMessage()
     message.type = FileType.COURSE
     message.manufacturer = Manufacturer.DEVELOPMENT.value
@@ -197,7 +199,7 @@ def main():
     bearing_min = 20 # only set coursepoints when the distance is over bearing_min
     trackpointindex = 0
     distance_since_last_direction = 0
-    
+
     # FIXME: checken of elke waypoint/coursepoint op een segment ligt danwel een trackpoint is. Als niet, voeg dan extra trackpoint toe (op goede plek)
 
     # print("Total GPS points: ", len(gpx.tracks[0].segments[0].points))
